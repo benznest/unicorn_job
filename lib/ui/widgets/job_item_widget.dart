@@ -171,7 +171,7 @@ class _JobItemWidgetState extends State<JobItemWidget> {
                         selectable: false,
                       ),
                       MyText.build(
-                        widget.job.workingDirectory,
+                        widget.job.commands,
                         fontSize: 16,
                         color: Colors.blueGrey[700],
                         selectable: false,
