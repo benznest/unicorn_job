@@ -1,22 +1,53 @@
-import 'dart:async';
-
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_rounded_date_picker/flutter_rounded_date_picker.dart';
 import 'package:unicorn_app_scheduler/my_theme.dart';
+import 'package:unicorn_app_scheduler/providers/jobs/job.dart';
+import 'package:unicorn_app_scheduler/providers/jobs/job_repetition.dart';
+import 'package:unicorn_app_scheduler/providers/jobs/job_storage.dart';
+import 'package:unicorn_app_scheduler/providers/tasks/task_manager.dart';
 import 'package:unicorn_app_scheduler/ui/widgets/core/button_icon_widget.dart';
 import 'package:unicorn_app_scheduler/ui/widgets/core/my_text.dart';
 import 'package:unicorn_app_scheduler/ui/widgets/core/my_text_field.dart';
-import 'package:unicorn_app_scheduler/ui/widgets/recurring_job_segmented_control_widget.dart';
+import 'package:unicorn_app_scheduler/ui/widgets/core/radio_box_widget.dart';
+import 'package:unicorn_app_scheduler/utils/my_date_utils.dart';
+import 'package:unicorn_app_scheduler/utils/my_snack_bar_util.dart';
+
+enum JobFormDialogMode { create, edit, delete }
 
 class JobFormDialog extends StatefulWidget {
-  JobFormDialog();
+  final JobFormDialogMode mode;
+  final Job? initJob;
+  final Function(Job)? onJobCreated;
+  final Function(Job)? onJobUpdated;
+  final Function(Job)? onJobDeleted;
 
-  static show(BuildContext context) async {
+  const JobFormDialog(
+      {Key? key,
+      required this.mode,
+      this.initJob,
+      this.onJobCreated,
+      this.onJobUpdated,
+      this.onJobDeleted})
+      : super(key: key);
+
+  static show(BuildContext context,
+      {required JobFormDialogMode mode,
+      Job? initJob,
+      Function(Job)? onJobCreated,
+      Function(Job)? onJobUpdated,
+      Function(Job)? onJobDeleted}) async {
     await showDialog(
         context: context,
         barrierDismissible: false,
         useSafeArea: true,
         barrierColor: Colors.grey[700]!.withOpacity(0.5),
-        builder: (context) => JobFormDialog());
+        builder: (context) => JobFormDialog(
+            mode: mode,
+            initJob: initJob,
+            onJobCreated: onJobCreated,
+            onJobUpdated: onJobUpdated,
+            onJobDeleted: onJobDeleted));
   }
 
   @override
@@ -24,8 +55,39 @@ class JobFormDialog extends StatefulWidget {
 }
 
 class _JobFormDialogState extends State<JobFormDialog> {
+  late TimeOfDay timeRepetition;
+  late DateTime dateTimeRepetition;
+  late JobRepetition jobRepetitionSelected;
+  bool readOnly = false;
+  final TextEditingController _jobTitleController = TextEditingController();
+  final TextEditingController _workingDirectoryController =
+      TextEditingController();
+  final TextEditingController _commandTitleController = TextEditingController();
+  GlobalKey<ScaffoldState> keyScaffold = GlobalKey();
+
   @override
   void initState() {
+    if (widget.mode == JobFormDialogMode.delete) {
+      readOnly = true;
+    }
+
+    if (widget.initJob != null) {
+      _jobTitleController.text = widget.initJob!.title;
+      _workingDirectoryController.text = widget.initJob!.workingDirectory;
+      _commandTitleController.text = widget.initJob!.commands;
+      jobRepetitionSelected =
+          JobRepetitionUtil.get(widget.initJob!.repetition) ??
+              JobRepetition.single;
+      timeRepetition = TimeOfDay(
+          hour: widget.initJob!.dateTime.hour,
+          minute: widget.initJob!.dateTime.minute);
+      dateTimeRepetition = widget.initJob!.dateTime;
+    } else {
+      timeRepetition = const TimeOfDay(hour: 0, minute: 0);
+      dateTimeRepetition = DateTime.now();
+      jobRepetitionSelected = JobRepetition.single;
+    }
+
     super.initState();
   }
 
@@ -38,9 +100,7 @@ class _JobFormDialogState extends State<JobFormDialog> {
   Widget build(BuildContext context) {
     return GestureDetector(
       onTap: () {
-        // if (widget.initResult != null) {
         Navigator.pop(context);
-        // }
       },
       child: Material(
         color: Colors.transparent,
@@ -49,17 +109,31 @@ class _JobFormDialogState extends State<JobFormDialog> {
             onTap: () {
               //
             },
-            child: SingleChildScrollView(
-              child: Container(
+            child: Container(
                 width: MediaQuery.of(context).size.width * 0.7,
-                margin: EdgeInsets.all(32),
-                padding: EdgeInsets.symmetric(horizontal: 50),
+                margin: const EdgeInsets.all(32),
                 decoration: BoxDecoration(
                     color: MyTheme.BACKGROUND_PRIMARY,
                     borderRadius: BorderRadius.circular(22)),
-                child: buildContent(context),
-              ),
-            ),
+                child: ScaffoldMessenger(
+                  child: Scaffold(
+                    backgroundColor: Colors.transparent,
+                    body: Builder(
+                      builder: (context) {
+                        return Column(
+                          children: [
+                        Expanded(child: buildContent(context)),
+                        Container(
+                          height: 2,
+                          color: Colors.grey[200],
+                        ),
+                        buildButtonSubmit(context)
+                          ],
+                        );
+                      },
+                    ),
+                  ),
+                )),
           ),
         ),
       ),
@@ -67,16 +141,15 @@ class _JobFormDialogState extends State<JobFormDialog> {
   }
 
   Widget buildContent(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.center,
+    return ListView(
+      padding: const EdgeInsets.all(32),
+      // crossAxisAlignment: CrossAxisAlignment.center,
+      // mainAxisSize: MainAxisSize.min,
       children: [
-        SizedBox(
-          height: 32,
-        ),
         Row(
           children: [
             Container(
-                padding: EdgeInsets.all(8),
+                padding: const EdgeInsets.all(8),
                 decoration: BoxDecoration(
                     color: Colors.lightBlue.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(16)),
@@ -84,7 +157,7 @@ class _JobFormDialogState extends State<JobFormDialog> {
                   "assets/images/ic_unicorn.png",
                   width: 60,
                 )),
-            SizedBox(
+            const SizedBox(
               width: 16,
             ),
             Expanded(
@@ -92,66 +165,343 @@ class _JobFormDialogState extends State<JobFormDialog> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   MyText.build("Job title", fontSize: 18),
-                  SizedBox(
+                  const SizedBox(
                     height: 4,
                   ),
                   MyTextFieldBuilder.buildTextCollapse(
-                      fontSize: 20),
+                      controller: _jobTitleController,
+                      readOnly:readOnly,
+                      fontSize: 20,
+                      textColor: Colors.purple[600]),
                 ],
               ),
             )
           ],
         ),
-        SizedBox(
+        const SizedBox(
           height: 16,
         ),
-        MyText.build("Recurring", fontSize: 18),
-        SizedBox(
-          height: 4,
+        Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+                color: Colors.grey[100],
+                borderRadius: BorderRadius.circular(12)),
+            child: Column(
+              children: [
+                MyText.build("Repetition",
+                    fontSize: 18, color: MyTheme.TEXT_PRIMARY),
+                const SizedBox(
+                  height: 2,
+                ),
+                MyText.build("How do you want the loop to work?",
+                    fontSize: 14, color: MyTheme.TEXT_SUBTITLE),
+                const SizedBox(
+                  height: 8,
+                ),
+                Wrap(
+                  spacing: 12,
+                  runSpacing: 12,
+                  children: [
+                    for (JobRepetition job in JobRepetition.values)
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          RadioBoxWidget(
+                            checked: jobRepetitionSelected == job,
+                            readOnly:readOnly,
+                            onCheck: (v) {
+                              setState(() {
+                                jobRepetitionSelected = job;
+                              });
+                            },
+                          ),
+                          const SizedBox(
+                            width: 6,
+                          ),
+                          MyText.build(job.title, fontSize: 16),
+                        ],
+                      ),
+                  ],
+                ),
+              ],
+            )),
+        const SizedBox(
+          height: 8,
         ),
-        RecurringJobSegmentedControlWidget(),
-        SizedBox(
+        Container(
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+                color: Colors.grey[100],
+                borderRadius: BorderRadius.circular(12)),
+            child: Row(
+              children: [
+                if (jobRepetitionSelected == JobRepetition.single)
+                  Expanded(
+                    flex: 3,
+                    child: Column(
+                      children: [
+                        MyText.build("Date", fontSize: 18),
+                        const SizedBox(
+                          height: 4,
+                        ),
+                        ButtonIconWidget(
+                          padding: const EdgeInsets.symmetric(
+                              vertical: 8, horizontal: 16),
+                          title: MyDateUtil.display(dateTimeRepetition),
+                          color: Colors.white,
+                          background: MyTheme.ACCENT,
+                          backgroundHover: MyTheme.ACCENT.withOpacity(0.9),
+                          fontSize: 14,
+                          iconTrail: Icons.edit,
+                          readOnly:readOnly,
+                          onTap: () async {
+                            DateTime? t = await showRoundedDatePicker(
+                              context: context,
+                              theme:
+                                  ThemeData(primarySwatch: Colors.deepPurple),
+                              initialDate: dateTimeRepetition,
+                            );
+                            if (t != null) {
+                              setState(() {
+                                dateTimeRepetition = t;
+                              });
+                            }
+                          },
+                        )
+                      ],
+                    ),
+                  ),
+                Expanded(
+                  flex: 2,
+                  child: Column(
+                    children: [
+                      MyText.build("Time", fontSize: 18),
+                      const SizedBox(
+                        height: 4,
+                      ),
+                      ButtonIconWidget(
+                        padding: const EdgeInsets.symmetric(
+                            vertical: 8, horizontal: 16),
+                        title: timeRepetition.format(context),
+                        color: Colors.white,
+                        background: MyTheme.ACCENT,
+                        backgroundHover: MyTheme.ACCENT.withOpacity(0.9),
+                        fontSize: 14,
+                        iconTrail: Icons.edit,
+                          readOnly:readOnly,
+                        onTap: () async {
+                          TimeOfDay? t = await showRoundedTimePicker(
+                            context: context,
+                            theme: ThemeData(primarySwatch: Colors.deepPurple),
+                            initialTime: timeRepetition,
+                          );
+                          if (t != null) {
+                            setState(() {
+                              timeRepetition = t;
+                            });
+                          }
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+            )),
+        const SizedBox(
           height: 16,
         ),
-        MyText.build("Date & Time", fontSize: 18),
-        SizedBox(
-          height: 4,
-        ),
-        MyTextFieldBuilder.buildTextCollapse(
-            fontSize: 20, textAlign: TextAlign.center),
-        SizedBox(
-          height: 16,
-        ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
+        Column(
           children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      MyText.build("Working directory", fontSize: 18),
+                      const SizedBox(
+                        height: 2,
+                      ),
+                      MyText.build("Path where the working file is located",
+                          fontSize: 14, color: MyTheme.TEXT_SUBTITLE),
+                    ],
+                  ),
+                ),
+                const SizedBox(
+                  width: 8,
+                ),
+                if(!readOnly)ButtonIconWidget(
+                  iconFront: Icons.folder,
+                  title: "Browse",
+                  fontSize: 14,
+                  color: MyTheme.PRIMARY,
+                  background: MyTheme.PRIMARY.withOpacity(0.2),
+                  backgroundHover: MyTheme.PRIMARY.withOpacity(0.3),
+                  onTap: () async {
+                    String? selectedDirectory =
+                        await FilePicker.platform.getDirectoryPath();
+
+                    if (selectedDirectory != null) {
+                      setState(() {
+                        _workingDirectoryController.text = selectedDirectory;
+                      });
+                    }
+                  },
+                )
+              ],
+            ),
+            const SizedBox(
+              height: 4,
+            ),
+            MyTextFieldBuilder.buildTextCollapse(
+                controller: _workingDirectoryController,
+                fontSize: 16,
+                textColor: Colors.purple[600],
+                readOnly:readOnly,
+                minLine: 3),
+          ],
+        ),
+        const SizedBox(
+          height: 16,
+        ),
+        Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            MyText.build("Command", fontSize: 18),
+            const SizedBox(
+              height: 2,
+            ),
+            MyText.build("Commands to be executed in the Shell.",
+                fontSize: 14, color: MyTheme.TEXT_SUBTITLE),
+            const SizedBox(
+              height: 4,
+            ),
+            MyTextFieldBuilder.buildTextCollapse(
+                controller: _commandTitleController,
+                fontSize: 16,
+                textColor: Colors.purple[600],
+                readOnly:readOnly,
+                minLine: 3),
+          ],
+        ),
+        const SizedBox(
+          height: 16,
+        ),
+      ],
+    );
+  }
+
+  buildButtonSubmit(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          ButtonIconWidget(
+            margin: const EdgeInsets.symmetric(horizontal: 4),
+            iconFront: Icons.close,
+            title: "Cancel",
+            color: Colors.grey[600]!,
+            background: Colors.grey[100],
+            backgroundHover: Colors.grey[200],
+            onTap: () {
+              Navigator.pop(context);
+            },
+          ),
+          if (widget.mode == JobFormDialogMode.delete)
             ButtonIconWidget(
-              icon: Icons.close,
-              title: "Close",
-              textColor: MyTheme.DANGER,
+              margin: const EdgeInsets.symmetric(horizontal: 4),
+              iconFront: Icons.delete,
+              title: "Delete",
+              color: MyTheme.DANGER,
               background: Colors.red[50],
               backgroundHover: Colors.red[100],
               onTap: () {
-                Navigator.pop(context);
+                delete(context);
               },
             ),
-            SizedBox(
-              width: 8,
-            ),
+          if (widget.mode == JobFormDialogMode.create ||
+              widget.mode == JobFormDialogMode.edit)
             ButtonIconWidget(
-              icon: Icons.check,
+              margin: const EdgeInsets.symmetric(horizontal: 4),
+              iconFront: Icons.check,
               title: "Save",
-              textColor: MyTheme.SUCCESS,
+              color: MyTheme.SUCCESS,
               background: Colors.green[50],
               backgroundHover: Colors.green[100],
               onTap: () {
-                Navigator.pop(context);
+                save(context);
               },
             ),
-          ],
-        ),
-        SizedBox(height: 32),
-      ],
+        ],
+      ),
     );
+  }
+
+  Future<void> save(BuildContext context) async {
+    String jobTitle = _jobTitleController.text.trim();
+    String workingDirectory = _workingDirectoryController.text.trim();
+    String commands = _commandTitleController.text.trim();
+
+    if (jobTitle.isEmpty) {
+      MySnackBarUtil.showDanger(
+        context,
+        message: "Job title is invalid.",
+      );
+      return;
+    }
+    if (workingDirectory.isEmpty) {
+      MySnackBarUtil.showDanger(
+        context,
+        message: "Working Directory is invalid.",
+      );
+      return;
+    }
+    if (commands.isEmpty) {
+      MySnackBarUtil.showDanger(
+        context,
+        message: "Commands is invalid.",
+      );
+      return;
+    }
+
+    Job job = widget.initJob ?? Job();
+    job.title = jobTitle;
+    job.workingDirectory = workingDirectory;
+    job.commands = commands;
+    job.repetition = jobRepetitionSelected.id;
+
+    if (jobRepetitionSelected == JobRepetition.single) {
+      job.dateTime = DateTime(dateTimeRepetition.year, dateTimeRepetition.month,
+          dateTimeRepetition.day, timeRepetition.hour, timeRepetition.minute);
+    } else if (jobRepetitionSelected == JobRepetition.daily) {
+      job.dateTime = DateTime(
+        0,
+        0,
+        0,
+        timeRepetition.hour,
+        timeRepetition.minute,
+      );
+    }
+
+    if (widget.mode == JobFormDialogMode.create) {
+      await JobStorage.add(job);
+      await TaskManager.createTask(job);
+      Navigator.pop(context);
+      widget.onJobCreated?.call(job);
+    } else if (widget.mode == JobFormDialogMode.edit) {
+      await job.save();
+      await TaskManager.delete(job);
+      Navigator.pop(context);
+      widget.onJobUpdated?.call(job);
+    }
+  }
+
+  Future<void> delete(BuildContext context) async {
+    await widget.initJob!.delete();
+    await TaskManager.delete(widget.initJob!);
+    Navigator.pop(context);
+    widget.onJobDeleted?.call(widget.initJob!);
   }
 }

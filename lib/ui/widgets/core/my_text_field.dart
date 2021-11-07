@@ -8,17 +8,19 @@ class MyTextFieldBuilder {
       Function(String)? onTextChanged,
       Function(String)? onSubmitted,
       Color? textColor,
+      Color? background,
       double? fontSize,
       int minLine = 1,
       int maxLine = 1,
       bool obscureText = false,
       FontWeight? fontWeight,
       FocusNode? focusNode,
-      TextAlign textAlign = TextAlign.start}) {
+      TextAlign textAlign = TextAlign.start,
+      bool readOnly = false}) {
     return Container(
-        padding: EdgeInsets.all(12),
+        padding: const EdgeInsets.all(12),
     decoration: BoxDecoration(
-    color: Colors.grey[100],
+    color: background ?? Colors.purple[50],
     borderRadius: BorderRadius.circular(12)),
     child:TextField(
       controller: controller,
@@ -29,6 +31,7 @@ class MyTextFieldBuilder {
       focusNode: focusNode,
       onSubmitted: onSubmitted,
       textAlign: textAlign,
+      readOnly: readOnly,
       decoration: InputDecoration(
           border: InputBorder.none,
           contentPadding: const EdgeInsets.all(2),

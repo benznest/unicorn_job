@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:unicorn_app_scheduler/ui/widgets/core/my_text.dart';
-import 'package:unicorn_app_scheduler/my_theme.dart';
 
 class MenuItemWidget extends StatefulWidget {
   final String icon;
@@ -9,12 +7,12 @@ class MenuItemWidget extends StatefulWidget {
   final bool isSelected;
   final Function()? onTap;
 
-  MenuItemWidget(
-      {required this.icon,
+   const MenuItemWidget(
+      {Key? key, required this.icon,
       required this.title,
       this.displayTitle = true,
       this.isSelected = false,
-      this.onTap});
+      this.onTap}) : super(key: key);
 
   @override
   _MenuItemWidgetState createState() => _MenuItemWidgetState();
@@ -49,8 +47,8 @@ class _MenuItemWidgetState extends State<MenuItemWidget> {
         },
         child:
         Container(
-          padding: EdgeInsets.all(6),
-          margin: EdgeInsets.only(left: 4),
+          padding: const EdgeInsets.all(6),
+          margin:const EdgeInsets.only(left: 4),
           decoration: BoxDecoration(
               color: getBackground(),
               borderRadius: BorderRadius.circular(16)),
