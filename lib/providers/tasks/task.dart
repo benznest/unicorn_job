@@ -4,10 +4,16 @@ part 'task.g.dart';
 
 @HiveType(typeId: 2)
 class Task extends HiveObject {
-  Task({required this.jobId, int? number, bool? launched}) {
+  Task({
+    this.jobId,
+    int? number,
+    bool? launched,
+    bool? skip,
+  }) {
     id = DateTime.now().millisecondsSinceEpoch;
     this.number = number ?? 1;
     this.launched = launched ?? false;
+    this.skip = skip ?? false;
   }
 
   @HiveField(0)
@@ -32,5 +38,8 @@ class Task extends HiveObject {
   late int number;
 
   @HiveField(7)
-  late int? jobId;
+  int? jobId;
+
+  @HiveField(8)
+  bool? skip;
 }

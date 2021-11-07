@@ -122,12 +122,12 @@ class _JobFormDialogState extends State<JobFormDialog> {
                       builder: (context) {
                         return Column(
                           children: [
-                        Expanded(child: buildContent(context)),
-                        Container(
-                          height: 2,
-                          color: Colors.grey[200],
-                        ),
-                        buildButtonSubmit(context)
+                            Expanded(child: buildContent(context)),
+                            Container(
+                              height: 2,
+                              color: Colors.grey[200],
+                            ),
+                            buildButtonSubmit(context)
                           ],
                         );
                       },
@@ -170,7 +170,7 @@ class _JobFormDialogState extends State<JobFormDialog> {
                   ),
                   MyTextFieldBuilder.buildTextCollapse(
                       controller: _jobTitleController,
-                      readOnly:readOnly,
+                      readOnly: readOnly,
                       fontSize: 20,
                       textColor: Colors.purple[600]),
                 ],
@@ -209,7 +209,7 @@ class _JobFormDialogState extends State<JobFormDialog> {
                         children: [
                           RadioBoxWidget(
                             checked: jobRepetitionSelected == job,
-                            readOnly:readOnly,
+                            readOnly: readOnly,
                             onCheck: (v) {
                               setState(() {
                                 jobRepetitionSelected = job;
@@ -254,7 +254,7 @@ class _JobFormDialogState extends State<JobFormDialog> {
                           backgroundHover: MyTheme.ACCENT.withOpacity(0.9),
                           fontSize: 14,
                           iconTrail: Icons.edit,
-                          readOnly:readOnly,
+                          readOnly: readOnly,
                           onTap: () async {
                             DateTime? t = await showRoundedDatePicker(
                               context: context,
@@ -289,7 +289,7 @@ class _JobFormDialogState extends State<JobFormDialog> {
                         backgroundHover: MyTheme.ACCENT.withOpacity(0.9),
                         fontSize: 14,
                         iconTrail: Icons.edit,
-                          readOnly:readOnly,
+                        readOnly: readOnly,
                         onTap: () async {
                           TimeOfDay? t = await showRoundedTimePicker(
                             context: context,
@@ -331,24 +331,25 @@ class _JobFormDialogState extends State<JobFormDialog> {
                 const SizedBox(
                   width: 8,
                 ),
-                if(!readOnly)ButtonIconWidget(
-                  iconFront: Icons.folder,
-                  title: "Browse",
-                  fontSize: 14,
-                  color: MyTheme.PRIMARY,
-                  background: MyTheme.PRIMARY.withOpacity(0.2),
-                  backgroundHover: MyTheme.PRIMARY.withOpacity(0.3),
-                  onTap: () async {
-                    String? selectedDirectory =
-                        await FilePicker.platform.getDirectoryPath();
+                if (!readOnly)
+                  ButtonIconWidget(
+                    iconFront: Icons.folder,
+                    title: "Browse",
+                    fontSize: 14,
+                    color: MyTheme.PRIMARY,
+                    background: MyTheme.PRIMARY.withOpacity(0.2),
+                    backgroundHover: MyTheme.PRIMARY.withOpacity(0.3),
+                    onTap: () async {
+                      String? selectedDirectory =
+                          await FilePicker.platform.getDirectoryPath();
 
-                    if (selectedDirectory != null) {
-                      setState(() {
-                        _workingDirectoryController.text = selectedDirectory;
-                      });
-                    }
-                  },
-                )
+                      if (selectedDirectory != null) {
+                        setState(() {
+                          _workingDirectoryController.text = selectedDirectory;
+                        });
+                      }
+                    },
+                  )
               ],
             ),
             const SizedBox(
@@ -358,7 +359,7 @@ class _JobFormDialogState extends State<JobFormDialog> {
                 controller: _workingDirectoryController,
                 fontSize: 16,
                 textColor: Colors.purple[600],
-                readOnly:readOnly,
+                readOnly: readOnly,
                 minLine: 3),
           ],
         ),
@@ -381,7 +382,7 @@ class _JobFormDialogState extends State<JobFormDialog> {
                 controller: _commandTitleController,
                 fontSize: 16,
                 textColor: Colors.purple[600],
-                readOnly:readOnly,
+                readOnly: readOnly,
                 minLine: 3),
           ],
         ),
@@ -492,7 +493,14 @@ class _JobFormDialogState extends State<JobFormDialog> {
       widget.onJobCreated?.call(job);
     } else if (widget.mode == JobFormDialogMode.edit) {
       await job.save();
-      await TaskManager.delete(job);
+
+      if (jobRepetitionSelected == JobRepetition.daily ||
+          (jobRepetitionSelected == JobRepetition.single &&
+              dateTimeRepetition.isAfter(DateTime.now()))) {
+        await TaskManager.delete(job);
+        await TaskManager.createTask(job);
+      }
+
       Navigator.pop(context);
       widget.onJobUpdated?.call(job);
     }

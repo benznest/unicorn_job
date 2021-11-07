@@ -1,19 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:unicorn_app_scheduler/my_theme.dart';
+import 'package:unicorn_app_scheduler/providers/tasks/task.dart';
+import 'package:unicorn_app_scheduler/providers/tasks/task_manager.dart';
 import 'package:unicorn_app_scheduler/ui/widgets/task_option_widget.dart';
 
 class TaskOptionDialog extends StatefulWidget {
-  const TaskOptionDialog({Key? key}) : super(key: key);
+  final Task task;
 
-  static show(
-    BuildContext context,
-  ) async {
+  const TaskOptionDialog({Key? key, required this.task}) : super(key: key);
+
+  static show(BuildContext context, {required Task task}) async {
     await showDialog(
         context: context,
         barrierDismissible: false,
         useSafeArea: true,
         barrierColor: Colors.grey[700]!.withOpacity(0.5),
-        builder: (context) => TaskOptionDialog());
+        builder: (context) => TaskOptionDialog(task: task));
   }
 
   @override
@@ -44,18 +46,39 @@ class _TaskOptionDialogState extends State<TaskOptionDialog> {
               onTap: () {
                 //
               },
-              child: Container(
-                  margin: const EdgeInsets.all(16),
-                  padding: const EdgeInsets.all(16),
-                  decoration: BoxDecoration(
-                      color: MyTheme.BACKGROUND_PRIMARY,
-                      borderRadius: BorderRadius.circular(22)),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      buildContent(context),
-                    ],
-                  )),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.pop(context);
+                    },
+                    child: MouseRegion(
+                      cursor: SystemMouseCursors.click,
+                      child: Container(
+                        margin: const EdgeInsets.only(left: 300),
+                        child: const Icon(
+                          Icons.close,
+                          color: Colors.white,
+                          size: 36,
+                        ),
+                      ),
+                    ),
+                  ),
+                  Container(
+                      margin: const EdgeInsets.all(16),
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                          color: MyTheme.BACKGROUND_PRIMARY,
+                          borderRadius: BorderRadius.circular(22)),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          buildContent(context),
+                        ],
+                      )),
+                ],
+              ),
             ),
           ),
         ));
@@ -63,7 +86,8 @@ class _TaskOptionDialogState extends State<TaskOptionDialog> {
 
   Widget buildContent(BuildContext context) {
     return Wrap(
-      spacing: 8,runSpacing: 8,
+      spacing: 8,
+      runSpacing: 8,
       children: [
         TaskOptionWidget(
           title: "Launch!",
@@ -73,6 +97,10 @@ class _TaskOptionDialogState extends State<TaskOptionDialog> {
           backgroundHover: MyTheme.ACCENT.withOpacity(0.8),
           textColor: Colors.grey[800],
           textColorHover: Colors.white,
+          onTap: () {
+            TaskManager.launch(widget.task);
+            Navigator.pop(context);
+          },
         ),
         TaskOptionWidget(
           title: "Skip",
@@ -82,9 +110,12 @@ class _TaskOptionDialogState extends State<TaskOptionDialog> {
           backgroundHover: MyTheme.ACCENT.withOpacity(0.8),
           textColor: Colors.grey[800],
           textColorHover: Colors.white,
+          onTap: () {
+            TaskManager.launch(widget.task, skip: true);
+            Navigator.pop(context);
+          },
         ),
       ],
     );
   }
-
 }

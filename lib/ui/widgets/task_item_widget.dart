@@ -25,7 +25,7 @@ class _TaskItemWidgetState extends State<TaskItemWidget> {
 
   @override
   void initState() {
-    if (now.isBefore(widget.task.dateTime)) {
+    if (!widget.task.launched && now.isBefore(widget.task.dateTime)) {
       _timer = Timer.periodic(const Duration(seconds: 1), (timer) {
         now = DateTime.now();
         setState(() {
@@ -96,7 +96,7 @@ class _TaskItemWidgetState extends State<TaskItemWidget> {
                         backgroundHover: MyTheme.ACCENT.withOpacity(0.2),
                         spaceBetweenIconTextFront: 0,
                         onTap: () {
-                          TaskOptionDialog.show(context);
+                          TaskOptionDialog.show(context, task: widget.task);
                         },
                       ),
                     if (widget.task.launched)
@@ -165,7 +165,7 @@ class _TaskItemWidgetState extends State<TaskItemWidget> {
                 const SizedBox(
                   height: 4,
                 ),
-                if (widget.task.dateTime.isAfter(now))
+                if (!widget.task.launched && widget.task.dateTime.isAfter(now))
                   Row(
                     mainAxisAlignment: MainAxisAlignment.end,
                     children: [
@@ -189,8 +189,19 @@ class _TaskItemWidgetState extends State<TaskItemWidget> {
   }
 
   Container buildStatusIcon() {
-    bool launch = widget.task.launched;
-    if (launch) {
+    if (widget.task.skip ?? false) {
+      return Container(
+          padding: const EdgeInsets.all(6),
+          decoration: BoxDecoration(
+              color: Colors.red.withOpacity(0.1),
+              borderRadius: BorderRadius.circular(12)),
+          child: Image.asset(
+            "assets/images/ic_launch_skip.png",
+            width: 40,
+          ));
+    }
+
+    if (widget.task.launched) {
       return Container(
           padding: const EdgeInsets.all(6),
           decoration: BoxDecoration(

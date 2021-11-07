@@ -14,6 +14,15 @@ class JobStorage{
     return box.values.map((d) => d as Job).toList().reversed.toList();
   }
 
+  static Job? find(int? jobId){
+    List<Job> listJob = get();
+    for(Job job in listJob){
+      if(job.id == jobId){
+        return job;
+      }
+    }
+  }
+
   static add(Job job){
     var box = Hive.box(key);
     return box.add(job);

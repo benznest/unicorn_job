@@ -27,14 +27,14 @@ class Job extends HiveObject {
   @HiveField(5)
   late String commands;
 
-  DateTime? get nextLaunchDateTime {
+  DateTime? nextLaunchDateTime({DateTime? base}) {
     if (repetition == JobRepetition.single.id) {
       return dateTime;
     }
     if (repetition == JobRepetition.daily.id) {
       int hr = dateTime.hour;
       int minute = dateTime.minute;
-      DateTime now = DateTime.now();
+      DateTime now = base ?? DateTime.now();
       DateTime dt = DateTime(now.year, now.month, now.day, hr, minute);
       if (dt.isBefore(now)) {
         dt = dt.add(const Duration(days: 1));
