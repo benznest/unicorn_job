@@ -105,17 +105,18 @@ class _JobItemWidgetState extends State<JobItemWidget> {
                     width: 8,
                   ),
                   ButtonIconWidget(
-                      iconFront: Icons.delete,
-                      color: MyTheme.DANGER,
-                      background: MyTheme.DANGER.withOpacity(0.1),
-                      backgroundHover: MyTheme.DANGER.withOpacity(0.2),
-                      spaceBetweenIconTextFront: 0,onTap: (){
-
-                    JobFormDialog.show(context,
-                        mode: JobFormDialogMode.delete,
-                        initJob: widget.job,
-                        onJobDeleted: widget.onJobDeleted);
-                  },)
+                    iconFront: Icons.delete,
+                    color: MyTheme.DANGER,
+                    background: MyTheme.DANGER.withOpacity(0.1),
+                    backgroundHover: MyTheme.DANGER.withOpacity(0.2),
+                    spaceBetweenIconTextFront: 0,
+                    onTap: () {
+                      JobFormDialog.show(context,
+                          mode: JobFormDialogMode.delete,
+                          initJob: widget.job,
+                          onJobDeleted: widget.onJobDeleted);
+                    },
+                  )
                 ],
               ),
               const SizedBox(
@@ -143,31 +144,30 @@ class _JobItemWidgetState extends State<JobItemWidget> {
                       )
                     ],
                   )),
-              const SizedBox(
-                height: 4,
-              ),
-              Container(
-                  padding: const EdgeInsets.all(6),
-                  decoration: BoxDecoration(
-                      color: Colors.blueGrey[50],
-                      borderRadius: BorderRadius.circular(12)),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      MyText.build(
-                        "Arguments",
-                        fontSize: 12,
-                        color: Colors.blueGrey[200],
-                        selectable: false,
-                      ),
-                      MyText.build(
-                        widget.job.arguments,
-                        fontSize: 16,
-                        color: Colors.blueGrey[700],
-                        selectable: false,
-                      )
-                    ],
-                  )),
+              if (widget.job.arguments.isNotEmpty)
+                Container(
+                    margin: const EdgeInsets.only(top: 4),
+                    padding: const EdgeInsets.all(6),
+                    decoration: BoxDecoration(
+                        color: Colors.blueGrey[50],
+                        borderRadius: BorderRadius.circular(12)),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        MyText.build(
+                          "Arguments",
+                          fontSize: 12,
+                          color: Colors.blueGrey[200],
+                          selectable: false,
+                        ),
+                        MyText.build(
+                          widget.job.arguments,
+                          fontSize: 16,
+                          color: Colors.blueGrey[700],
+                          selectable: false,
+                        )
+                      ],
+                    )),
             ],
           ),
         )));

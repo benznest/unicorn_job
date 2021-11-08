@@ -1,5 +1,6 @@
 import 'dart:async';
 
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:unicorn_app_scheduler/my_image_asset.dart';
 import 'package:unicorn_app_scheduler/my_theme.dart';
@@ -138,31 +139,30 @@ class _TaskItemWidgetState extends State<TaskItemWidget> {
                         )
                       ],
                     )),
-                const SizedBox(
-                  height: 4,
-                ),
-                Container(
-                    padding: const EdgeInsets.all(6),
-                    decoration: BoxDecoration(
-                        color: Colors.blueGrey[50],
-                        borderRadius: BorderRadius.circular(12)),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        MyText.build(
-                          "Arguments",
-                          fontSize: 12,
-                          color: Colors.blueGrey[200],
-                          selectable: false,
-                        ),
-                        MyText.build(
-                          widget.task.arguments,
-                          fontSize: 16,
-                          color: Colors.blueGrey[900],
-                          selectable: false,
-                        )
-                      ],
-                    )),
+                if (widget.task.arguments.isNotEmpty)
+                  Container(
+                    margin: const EdgeInsets.only(top: 4),
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(
+                          color: Colors.blueGrey[50],
+                          borderRadius: BorderRadius.circular(12)),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          MyText.build(
+                            "Arguments",
+                            fontSize: 12,
+                            color: Colors.blueGrey[200],
+                            selectable: false,
+                          ),
+                          MyText.build(
+                            widget.task.arguments,
+                            fontSize: 16,
+                            color: Colors.blueGrey[900],
+                            selectable: false,
+                          )
+                        ],
+                      )),
                 const SizedBox(
                   height: 4,
                 ),
