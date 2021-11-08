@@ -25,8 +25,8 @@ class TaskAdapter extends TypeAdapter<Task> {
       ..id = fields[0] as int
       ..title = fields[1] as String
       ..dateTime = fields[2] as DateTime
-      ..workingDirectory = fields[3] as String
-      ..commands = fields[4] as String;
+      ..executable = fields[3] as String
+      ..arguments = fields[4] as String;
   }
 
   @override
@@ -40,9 +40,9 @@ class TaskAdapter extends TypeAdapter<Task> {
       ..writeByte(2)
       ..write(obj.dateTime)
       ..writeByte(3)
-      ..write(obj.workingDirectory)
+      ..write(obj.executable)
       ..writeByte(4)
-      ..write(obj.commands)
+      ..write(obj.arguments)
       ..writeByte(5)
       ..write(obj.launched)
       ..writeByte(6)

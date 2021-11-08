@@ -26,7 +26,7 @@ int APIENTRY wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE prev,
 
   FlutterWindow window(project);
   Win32Window::Point origin(50, 50);
-  Win32Window::Size size(600, 800);
+  Win32Window::Size size(800, 600);
   if (!window.CreateAndShow(L"Unicorn Job - Task Scheduler", origin, size)) {
     return EXIT_FAILURE;
   }

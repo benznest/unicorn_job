@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rounded_date_picker/flutter_rounded_date_picker.dart';
@@ -60,9 +62,9 @@ class _JobFormDialogState extends State<JobFormDialog> {
   late JobRepetition jobRepetitionSelected;
   bool readOnly = false;
   final TextEditingController _jobTitleController = TextEditingController();
-  final TextEditingController _workingDirectoryController =
+  final TextEditingController _exeutableController = TextEditingController();
+  final TextEditingController _argumentsTitleController =
       TextEditingController();
-  final TextEditingController _commandTitleController = TextEditingController();
   GlobalKey<ScaffoldState> keyScaffold = GlobalKey();
 
   @override
@@ -73,8 +75,8 @@ class _JobFormDialogState extends State<JobFormDialog> {
 
     if (widget.initJob != null) {
       _jobTitleController.text = widget.initJob!.title;
-      _workingDirectoryController.text = widget.initJob!.workingDirectory;
-      _commandTitleController.text = widget.initJob!.commands;
+      _exeutableController.text = widget.initJob!.executable;
+      _argumentsTitleController.text = widget.initJob!.arguments;
       jobRepetitionSelected =
           JobRepetitionUtil.get(widget.initJob!.repetition) ??
               JobRepetition.single;
@@ -83,7 +85,8 @@ class _JobFormDialogState extends State<JobFormDialog> {
           minute: widget.initJob!.dateTime.minute);
       dateTimeRepetition = widget.initJob!.dateTime;
     } else {
-      timeRepetition = const TimeOfDay(hour: 0, minute: 0);
+      DateTime dt = DateTime.now().add(const Duration(hours: 1));
+      timeRepetition = TimeOfDay.fromDateTime(dt);
       dateTimeRepetition = DateTime.now();
       jobRepetitionSelected = JobRepetition.single;
     }
@@ -171,7 +174,7 @@ class _JobFormDialogState extends State<JobFormDialog> {
                   MyTextFieldBuilder.buildTextCollapse(
                       controller: _jobTitleController,
                       readOnly: readOnly,
-                      fontSize: 20,
+                      fontSize: 16,
                       textColor: Colors.purple[600]),
                 ],
               ),
@@ -319,11 +322,11 @@ class _JobFormDialogState extends State<JobFormDialog> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      MyText.build("Working directory", fontSize: 18),
+                      MyText.build("Executable", fontSize: 18),
                       const SizedBox(
                         height: 2,
                       ),
-                      MyText.build("Path where the working file is located",
+                      MyText.build("The full path .exe file.",
                           fontSize: 14, color: MyTheme.TEXT_SUBTITLE),
                     ],
                   ),
@@ -340,12 +343,16 @@ class _JobFormDialogState extends State<JobFormDialog> {
                     background: MyTheme.PRIMARY.withOpacity(0.2),
                     backgroundHover: MyTheme.PRIMARY.withOpacity(0.3),
                     onTap: () async {
-                      String? selectedDirectory =
-                          await FilePicker.platform.getDirectoryPath();
+                      FilePickerResult? result = await FilePicker.platform
+                          .pickFiles(
+                        dialogTitle: "Choose executable file",
+                              allowedExtensions: ["exe"],
+                              type: FileType.custom);
 
-                      if (selectedDirectory != null) {
+                      if (result != null) {
+                        File file = File(result.files.single.path!);
                         setState(() {
-                          _workingDirectoryController.text = selectedDirectory;
+                          _exeutableController.text = file.path;
                         });
                       }
                     },
@@ -356,8 +363,8 @@ class _JobFormDialogState extends State<JobFormDialog> {
               height: 4,
             ),
             MyTextFieldBuilder.buildTextCollapse(
-                controller: _workingDirectoryController,
-                fontSize: 16,
+                controller: _exeutableController,
+                fontSize: 14,
                 textColor: Colors.purple[600],
                 readOnly: readOnly,
                 minLine: 3),
@@ -369,18 +376,18 @@ class _JobFormDialogState extends State<JobFormDialog> {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            MyText.build("Command", fontSize: 18),
+            MyText.build("Arguments", fontSize: 18),
             const SizedBox(
               height: 2,
             ),
-            MyText.build("Commands to be executed in the Shell.",
+            MyText.build("This field is optional, Example -auto",
                 fontSize: 14, color: MyTheme.TEXT_SUBTITLE),
             const SizedBox(
               height: 4,
             ),
             MyTextFieldBuilder.buildTextCollapse(
-                controller: _commandTitleController,
-                fontSize: 16,
+                controller: _argumentsTitleController,
+                fontSize: 14,
                 textColor: Colors.purple[600],
                 readOnly: readOnly,
                 minLine: 3),
@@ -442,8 +449,8 @@ class _JobFormDialogState extends State<JobFormDialog> {
 
   Future<void> save(BuildContext context) async {
     String jobTitle = _jobTitleController.text.trim();
-    String workingDirectory = _workingDirectoryController.text.trim();
-    String commands = _commandTitleController.text.trim();
+    String executable = _exeutableController.text.trim();
+    String arguments = _argumentsTitleController.text.trim();
 
     if (jobTitle.isEmpty) {
       MySnackBarUtil.showDanger(
@@ -452,25 +459,18 @@ class _JobFormDialogState extends State<JobFormDialog> {
       );
       return;
     }
-    if (workingDirectory.isEmpty) {
+    if (executable.isEmpty) {
       MySnackBarUtil.showDanger(
         context,
-        message: "Working Directory is invalid.",
-      );
-      return;
-    }
-    if (commands.isEmpty) {
-      MySnackBarUtil.showDanger(
-        context,
-        message: "Commands is invalid.",
+        message: "Executable path is invalid.",
       );
       return;
     }
 
     Job job = widget.initJob ?? Job();
     job.title = jobTitle;
-    job.workingDirectory = workingDirectory;
-    job.commands = commands;
+    job.executable = executable;
+    job.arguments = arguments;
     job.repetition = jobRepetitionSelected.id;
 
     if (jobRepetitionSelected == JobRepetition.single) {

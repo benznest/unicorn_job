@@ -26,10 +26,10 @@ class Task extends HiveObject {
   late DateTime dateTime;
 
   @HiveField(3)
-  late String workingDirectory;
+  late String executable;
 
   @HiveField(4)
-  late String commands;
+  late String arguments;
 
   @HiveField(5)
   late bool launched;

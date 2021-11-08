@@ -22,10 +22,10 @@ class Job extends HiveObject {
   late DateTime dateTime;
 
   @HiveField(4)
-  late String workingDirectory;
+  late String executable;
 
   @HiveField(5)
-  late String commands;
+  late String arguments;
 
   DateTime? nextLaunchDateTime({DateTime? base}) {
     if (repetition == JobRepetition.single.id) {

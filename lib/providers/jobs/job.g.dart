@@ -21,8 +21,8 @@ class JobAdapter extends TypeAdapter<Job> {
       ..title = fields[1] as String
       ..repetition = fields[2] as int
       ..dateTime = fields[3] as DateTime
-      ..workingDirectory = fields[4] as String
-      ..commands = fields[5] as String;
+      ..executable = fields[4] as String
+      ..arguments = fields[5] as String;
   }
 
   @override
@@ -38,9 +38,9 @@ class JobAdapter extends TypeAdapter<Job> {
       ..writeByte(3)
       ..write(obj.dateTime)
       ..writeByte(4)
-      ..write(obj.workingDirectory)
+      ..write(obj.executable)
       ..writeByte(5)
-      ..write(obj.commands);
+      ..write(obj.arguments);
   }
 
   @override

@@ -140,13 +140,13 @@ class _JobItemWidgetState extends State<JobItemWidget> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       MyText.build(
-                        "Working directory",
+                        "Executable",
                         fontSize: 12,
                         color: Colors.purple[200],
                         selectable: false,
                       ),
                       MyText.build(
-                        widget.job.workingDirectory,
+                        widget.job.executable,
                         fontSize: 16,
                         color: Colors.purple[600],
                         selectable: false,
@@ -165,13 +165,13 @@ class _JobItemWidgetState extends State<JobItemWidget> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       MyText.build(
-                        "Command",
+                        "Arguments",
                         fontSize: 12,
                         color: Colors.blueGrey[200],
                         selectable: false,
                       ),
                       MyText.build(
-                        widget.job.commands,
+                        widget.job.arguments,
                         fontSize: 16,
                         color: Colors.blueGrey[700],
                         selectable: false,

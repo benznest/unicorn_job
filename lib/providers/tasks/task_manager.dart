@@ -3,6 +3,7 @@ import 'package:unicorn_app_scheduler/providers/jobs/job_repetition.dart';
 import 'package:unicorn_app_scheduler/providers/jobs/job_storage.dart';
 import 'package:unicorn_app_scheduler/providers/tasks/task.dart';
 import 'package:unicorn_app_scheduler/providers/tasks/task_storage.dart';
+import 'package:unicorn_app_scheduler/commands/my_command.dart';
 
 class TaskManager {
   static check() {
@@ -15,8 +16,13 @@ class TaskManager {
     }
   }
 
-  static void launch(Task task,{bool skip = false}) {
-    task.launched = true;
+  static void launch(Task task, {bool skip = false}) {
+    if (!skip) {
+      MyCommand.run(
+          executable: task.executable, arguments: task.arguments);
+      task.launched = true;
+    }
+
     task.skip = skip;
     task.save();
 
@@ -34,8 +40,8 @@ class TaskManager {
     Task task = Task(jobId: job.id);
     task.title = job.title;
     task.dateTime = job.nextLaunchDateTime(base: base) ?? DateTime.now();
-    task.commands = job.commands;
-    task.workingDirectory = job.workingDirectory;
+    task.executable = job.executable;
+    task.arguments = job.arguments;
     task.launched = false;
     task.number = number ?? 1;
     TaskStorage.add(task);

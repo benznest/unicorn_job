@@ -124,13 +124,13 @@ class _TaskItemWidgetState extends State<TaskItemWidget> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         MyText.build(
-                          "Working directory",
+                          "Executable",
                           fontSize: 12,
                           color: Colors.purple[200],
                           selectable: false,
                         ),
                         MyText.build(
-                          widget.task.workingDirectory,
+                          widget.task.executable,
                           fontSize: 16,
                           color: Colors.purple[600],
                           selectable: false,
@@ -149,13 +149,13 @@ class _TaskItemWidgetState extends State<TaskItemWidget> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         MyText.build(
-                          "Command",
+                          "Arguments",
                           fontSize: 12,
                           color: Colors.blueGrey[200],
                           selectable: false,
                         ),
                         MyText.build(
-                          widget.task.commands,
+                          widget.task.arguments,
                           fontSize: 16,
                           color: Colors.blueGrey[900],
                           selectable: false,
