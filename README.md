@@ -1,19 +1,39 @@
-# unicorn_app_scheduler
-
-Unicorn App Scheduler
+# Unicorn Job
+Simple Task Scheduler App (2021)
 
 ## Getting Started
+This is my experimental project on Flutter for Windows.
+You can add a Job and have it run cmd at the specified time. just open the program.
 
-This project is a starting point for a Flutter application.
+![Screenshot](screenshots/1.png)
+![Screenshot](screenshots/2.png)
+![Screenshot](screenshots/3.png)
 
-A few resources to get you started if this is your first Flutter project:
+## Features
+- Create/Update/Delete a Job (Single task /Daily task).
+- Run the tasks using cmd executable file and arguments.
+- Force launch the task or skip the task.
+- Delete the task manually.
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+## what I learned
+The idea of this project I would like to try using 2 things:
+ - Hive and Hive generator : NO-SQL lightweight and blazing fast key-value database (Pure Dart).
+ - msix : Create the Msix installer.
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
-
-
+## Note
+if you want to build the project.
+Call Generator to create Hive adapter.
+```
 flutter packages pub run build_runner build
+```
+
+build Flutter Windows and run msix.
+```
+flutter build windows --release
+flutter pub run msix:create
+```
+
+## Download
+you can download the zip file or installer file in /release folder.
+
+![Screenshot](screenshots/4.png)

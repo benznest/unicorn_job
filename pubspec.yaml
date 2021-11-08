@@ -52,6 +52,7 @@ dev_dependencies:
   flutter_lints: ^1.0.0
   hive_generator: ^1.1.1
   build_runner: ^2.1.4
+  msix: ^2.6.2
 
 # For information on the generic Dart part of this file, see the
 # following page: https://dart.dev/tools/pub/pubspec
@@ -95,3 +96,10 @@ flutter:
   #
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/custom-fonts/#from-packages
+msix_config:
+  display_name: Unicorn Job
+  publisher_display_name: benznest
+  identity_name: benznest.dev.unicornjob
+  msix_version: 1.0.0.0
+  logo_path: C:\Flutter Project\unicorn_job\assets\images\ic_unicorn.png
+  capabilities: 'internetClient'
