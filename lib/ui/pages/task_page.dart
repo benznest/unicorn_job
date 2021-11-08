@@ -1,6 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:unicorn_app_scheduler/my_image_asset.dart';
 import 'package:unicorn_app_scheduler/my_theme.dart';
 import 'package:unicorn_app_scheduler/providers/tasks/task.dart';
 import 'package:unicorn_app_scheduler/providers/tasks/task_storage.dart';
@@ -57,7 +58,7 @@ class _TaskPageState extends State<TaskPage> {
                     mainAxisSize: MainAxisSize.min,
                     children: [
                       Image.asset(
-                        "assets/images/ic_launch.png",
+                        MyImageAsset.launch,
                         width: 80,
                       ),
                       MyText.build(

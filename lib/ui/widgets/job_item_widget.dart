@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:unicorn_app_scheduler/my_image_asset.dart';
 import 'package:unicorn_app_scheduler/my_theme.dart';
 import 'package:unicorn_app_scheduler/providers/jobs/job.dart';
 import 'package:unicorn_app_scheduler/providers/jobs/job_repetition.dart';
@@ -34,20 +35,9 @@ class _JobItemWidgetState extends State<JobItemWidget> {
   Widget build(BuildContext context) {
     return GestureDetector(
         onTap: () {
-          // widget.onTap?.call(widget.job);
+          //
         },
         child: MouseRegion(
-            // cursor: SystemMouseCursors.click,
-            // onEnter: (e) {
-            //   setState(() {
-            //     isHover = true;
-            //   });
-            // },
-            // onExit: (e) {
-            //   setState(() {
-            //     isHover = false;
-            //   });
-            // },
             child: CardWidget(
           borderRadius: BorderRadius.circular(16),
           background: isHover ? Colors.grey[50] : Colors.white,
@@ -62,7 +52,7 @@ class _JobItemWidgetState extends State<JobItemWidget> {
                           color: Colors.lightBlue.withOpacity(0.1),
                           borderRadius: BorderRadius.circular(12)),
                       child: Image.asset(
-                        "assets/images/ic_unicorn.png",
+                        MyImageAsset.unicorn,
                         width: 40,
                       )),
                   const SizedBox(

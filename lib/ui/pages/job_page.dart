@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:unicorn_app_scheduler/my_image_asset.dart';
 import 'package:unicorn_app_scheduler/my_theme.dart';
 import 'package:unicorn_app_scheduler/providers/jobs/job.dart';
 import 'package:unicorn_app_scheduler/providers/jobs/job_storage.dart';
@@ -85,7 +86,6 @@ class _JobPageState extends State<JobPage> {
     );
   }
 
-
   Widget buildNoData() {
     return Center(
       child: CardWidget(
@@ -94,14 +94,16 @@ class _JobPageState extends State<JobPage> {
             mainAxisSize: MainAxisSize.min,
             children: [
               Image.asset(
-                "assets/images/ic_playlist.png",
+                MyImageAsset.job,
                 width: 80,
               ),
               MyText.build(
                 "Empty job!",
                 fontSize: 20,
               ),
-              const SizedBox(height: 2,),
+              const SizedBox(
+                height: 2,
+              ),
               MyText.build("There is no job here yet.",
                   fontSize: 16, color: MyTheme.TEXT_SUBTITLE),
             ],

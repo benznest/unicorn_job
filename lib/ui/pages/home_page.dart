@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:unicorn_app_scheduler/ui/pages/about_page.dart';
 import 'package:unicorn_app_scheduler/ui/pages/job_page.dart';
 import 'package:unicorn_app_scheduler/ui/pages/task_page.dart';
 import 'package:unicorn_app_scheduler/ui/widgets/menu_item_widget.dart';
@@ -59,6 +60,9 @@ class _MyHomePageState extends State<MyHomePage> {
     }
     if (menuSelected == HomePageMenu.JOBS) {
       return const JobPage();
+    }
+    if (menuSelected == HomePageMenu.ABOUT) {
+      return const AboutPage();
     }
     return Container(
     );

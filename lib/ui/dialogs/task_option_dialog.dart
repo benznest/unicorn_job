@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:unicorn_app_scheduler/my_image_asset.dart';
 import 'package:unicorn_app_scheduler/my_theme.dart';
 import 'package:unicorn_app_scheduler/providers/tasks/task.dart';
 import 'package:unicorn_app_scheduler/providers/tasks/task_manager.dart';
@@ -92,7 +93,7 @@ class _TaskOptionDialogState extends State<TaskOptionDialog> {
         TaskOptionWidget(
           title: "Launch!",
           subtitle: "Run the command immediately.",
-          icon: "assets/images/ic_launch.png",
+          icon: MyImageAsset.launch,
           background: MyTheme.ACCENT.withOpacity(0.1),
           backgroundHover: MyTheme.ACCENT.withOpacity(0.8),
           textColor: Colors.grey[800],
@@ -105,7 +106,7 @@ class _TaskOptionDialogState extends State<TaskOptionDialog> {
         TaskOptionWidget(
           title: "Skip",
           subtitle: "Skip to the next time.",
-          icon: "assets/images/ic_skip.png",
+          icon: MyImageAsset.skip,
           background: MyTheme.ACCENT.withOpacity(0.1),
           backgroundHover: MyTheme.ACCENT.withOpacity(0.8),
           textColor: Colors.grey[800],

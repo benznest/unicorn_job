@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_rounded_date_picker/flutter_rounded_date_picker.dart';
+import 'package:unicorn_app_scheduler/my_image_asset.dart';
 import 'package:unicorn_app_scheduler/my_theme.dart';
 import 'package:unicorn_app_scheduler/providers/jobs/job.dart';
 import 'package:unicorn_app_scheduler/providers/jobs/job_repetition.dart';
@@ -62,7 +63,7 @@ class _JobFormDialogState extends State<JobFormDialog> {
   late JobRepetition jobRepetitionSelected;
   bool readOnly = false;
   final TextEditingController _jobTitleController = TextEditingController();
-  final TextEditingController _exeutableController = TextEditingController();
+  final TextEditingController _executableController = TextEditingController();
   final TextEditingController _argumentsTitleController =
       TextEditingController();
   GlobalKey<ScaffoldState> keyScaffold = GlobalKey();
@@ -75,7 +76,7 @@ class _JobFormDialogState extends State<JobFormDialog> {
 
     if (widget.initJob != null) {
       _jobTitleController.text = widget.initJob!.title;
-      _exeutableController.text = widget.initJob!.executable;
+      _executableController.text = widget.initJob!.executable;
       _argumentsTitleController.text = widget.initJob!.arguments;
       jobRepetitionSelected =
           JobRepetitionUtil.get(widget.initJob!.repetition) ??
@@ -157,7 +158,7 @@ class _JobFormDialogState extends State<JobFormDialog> {
                     color: Colors.lightBlue.withOpacity(0.1),
                     borderRadius: BorderRadius.circular(16)),
                 child: Image.asset(
-                  "assets/images/ic_unicorn.png",
+                  MyImageAsset.unicorn,
                   width: 60,
                 )),
             const SizedBox(
@@ -352,7 +353,7 @@ class _JobFormDialogState extends State<JobFormDialog> {
                       if (result != null) {
                         File file = File(result.files.single.path!);
                         setState(() {
-                          _exeutableController.text = file.path;
+                          _executableController.text = file.path;
                         });
                       }
                     },
@@ -363,7 +364,7 @@ class _JobFormDialogState extends State<JobFormDialog> {
               height: 4,
             ),
             MyTextFieldBuilder.buildTextCollapse(
-                controller: _exeutableController,
+                controller: _executableController,
                 fontSize: 14,
                 textColor: Colors.purple[600],
                 readOnly: readOnly,
@@ -449,7 +450,7 @@ class _JobFormDialogState extends State<JobFormDialog> {
 
   Future<void> save(BuildContext context) async {
     String jobTitle = _jobTitleController.text.trim();
-    String executable = _exeutableController.text.trim();
+    String executable = _executableController.text.trim();
     String arguments = _argumentsTitleController.text.trim();
 
     if (jobTitle.isEmpty) {

@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:unicorn_app_scheduler/my_image_asset.dart';
 import 'package:unicorn_app_scheduler/my_theme.dart';
 import 'package:unicorn_app_scheduler/providers/tasks/task.dart';
 import 'package:unicorn_app_scheduler/ui/dialogs/task_option_dialog.dart';
@@ -196,7 +197,7 @@ class _TaskItemWidgetState extends State<TaskItemWidget> {
               color: Colors.red.withOpacity(0.1),
               borderRadius: BorderRadius.circular(12)),
           child: Image.asset(
-            "assets/images/ic_launch_skip.png",
+            MyImageAsset.launchSkip,
             width: 40,
           ));
     }
@@ -208,7 +209,7 @@ class _TaskItemWidgetState extends State<TaskItemWidget> {
               color: Colors.lightGreen.withOpacity(0.2),
               borderRadius: BorderRadius.circular(12)),
           child: Image.asset(
-            "assets/images/ic_rocket_launch.png",
+            MyImageAsset.rocketLaunch,
             width: 40,
           ));
     } else {
@@ -219,7 +220,7 @@ class _TaskItemWidgetState extends State<TaskItemWidget> {
                 color: Colors.red.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(12)),
             child: Image.asset(
-              "assets/images/ic_rocket_error.png",
+              MyImageAsset.rocketError,
               width: 40,
             ));
       } else {
@@ -229,7 +230,7 @@ class _TaskItemWidgetState extends State<TaskItemWidget> {
                 color: Colors.lightBlue.withOpacity(0.1),
                 borderRadius: BorderRadius.circular(12)),
             child: Image.asset(
-              "assets/images/ic_timer.png",
+              MyImageAsset.timer,
               width: 40,
             ));
       }
